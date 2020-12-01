@@ -1,5 +1,5 @@
 (*
-Kako razdelimo string na dele glede na nek znak, sem pogledal na stackoverfov:
+Kako razdeliti string na dele glede na nek znak, sem pogledal na stackoverfov:
 https://stackoverflow.com/questions/23204953/does-ocaml-have-string-split-function-like-python
 *)
 
@@ -29,19 +29,45 @@ let naloga1 vsebina_datoteke =
     |> resi
     |> string_of_int
 
-let seznam array = 
+let polje_resitev array = 
     let n = Array.length array in
     let vsota_brez_el k = 
         let na_mestu j = if j < k then array.(j) else array.(j + 1)
         in
         let polje_brez_k = Array.init (n - 1) na_mestu
-        in elementa_z_vsoto polje_brez_k (2020 - array.(k))
+        in elementa_z_vsoto polje_brez_k (99 - array.(k))
     in
-    Array.init n vsota_brez_el
+    let naredi_trojico k = 
+        let pair = vsota_brez_el k in
+        match pair with
+        | None -> None
+        | Some (a, b) -> Some (array.(k), a, b)
+    in
+    Array.init n naredi_trojico
 
+let a = [|1; 2; 4; 6; 8; 9; 10; 89; 100|]
+
+let resi3 list = 
+    let array = Array.of_list list in
+    let seznam_resitev = Array.to_list (polje_resitev array) in
+    let rec izberi_resitev seznam = 
+        match seznam with
+        | [] -> failwith "Napaka"
+        | res::ostalo -> match res with
+            | Some (a, b, c) -> a * b * c
+            | None -> izberi_resitev ostalo
+    in
+    izberi_resitev seznam_resitev
+
+
+(* Zaenkrat je neka napaka, nisem še ugotovil kaj je narobe *)
 let naloga2 vsebina_datoteke =
-    "kmalu"
-    
+    vsebina_datoteke
+    |> String.split_on_char ' '
+    |> List.filter (fun s -> s <> "")
+    |> List.map int_of_string
+    |> resi3
+    |> string_of_int
 
 let _ =
     let preberi_datoteko ime_datoteke =

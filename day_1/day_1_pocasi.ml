@@ -45,8 +45,6 @@ let naloga1 vsebina_datoteke =
     |> resi1
     |> string_of_int
 
-(*381699*)
-
 let naloga2 vsebina_datoteke =
     vsebina_datoteke
     |> String.split_on_char ' '
