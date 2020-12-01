@@ -3,70 +3,54 @@ Kako razdeliti string na dele glede na nek znak, sem pogledal na stackoverfov:
 https://stackoverflow.com/questions/23204953/does-ocaml-have-string-split-function-like-python
 *)
 
-let elementa_z_vsoto array sum = 
-    let rec aux i j = 
-        if i >= j then None
-        else let s = array.(i) + array.(j) in 
-            if s > sum then aux i (j - 1)
-            else if s < sum then aux (i + 1) j
-            else Some (array.(i), array.(j))
-    in aux 0 (Array.length array - 1)
 
-let resi array = 
-    Array.sort (-) array;
-    let pair = elementa_z_vsoto array 2020 in
+let rec vsota1 list sum = 
+    match list with
+    | [] -> None
+    | x::xs -> if x = sum then (Some x) else vsota1 xs sum
+
+let rec vsota2 list sum = 
+    match list with
+    | [] -> None
+    | x::xs -> let out = vsota1 xs (sum - x) in
+        match out with
+        | None -> vsota2 xs sum
+        | Some y -> Some (x, y)
+
+let rec vsota3 list sum = 
+    match list with
+    | [] -> None
+    | x::xs -> let out = vsota2 xs (sum - x) in
+        match out with
+        | None -> vsota3 xs sum
+        | Some (y, z) -> Some (x, y, z)
+
+let resi1 list = 
+    let pair = vsota2 list 2020 in
     match pair with
     | None -> failwith "Napaka"
-    | Some (a, b) -> a * b
+    | Some (x, y) -> x * y
 
+let resi2 list = 
+    let pair = vsota3 list 2020 in
+    match pair with
+    | None -> failwith "Napaka"
+    | Some (x, y, z) -> x * y * z
 
 let naloga1 vsebina_datoteke =
     vsebina_datoteke
     |> String.split_on_char ' '
     |> List.filter (fun s -> s <> "")
     |> List.map int_of_string
-    |> Array.of_list
-    |> resi
+    |> resi1
     |> string_of_int
 
-let polje_resitev array = 
-    let n = Array.length array in
-    let vsota_brez_el k = 
-        let na_mestu j = if j < k then array.(j) else array.(j + 1)
-        in
-        let polje_brez_k = Array.init (n - 1) na_mestu
-        in elementa_z_vsoto polje_brez_k (99 - array.(k))
-    in
-    let naredi_trojico k = 
-        let pair = vsota_brez_el k in
-        match pair with
-        | None -> None
-        | Some (a, b) -> Some (array.(k), a, b)
-    in
-    Array.init n naredi_trojico
-
-let a = [|1; 2; 4; 6; 8; 9; 10; 89; 100|]
-
-let resi3 list = 
-    let array = Array.of_list list in
-    let seznam_resitev = Array.to_list (polje_resitev array) in
-    let rec izberi_resitev seznam = 
-        match seznam with
-        | [] -> failwith "Napaka"
-        | res::ostalo -> match res with
-            | Some (a, b, c) -> a * b * c
-            | None -> izberi_resitev ostalo
-    in
-    izberi_resitev seznam_resitev
-
-
-(* Zaenkrat je neka napaka, nisem še ugotovil kaj je narobe *)
 let naloga2 vsebina_datoteke =
     vsebina_datoteke
     |> String.split_on_char ' '
     |> List.filter (fun s -> s <> "")
     |> List.map int_of_string
-    |> resi3
+    |> resi2
     |> string_of_int
 
 let _ =
