@@ -1,8 +1,3 @@
-
-
-let a = "whyasajsajfjaf"
-let b = a.[0]
-
 let count str char = 
     let rec aux count index = 
         if index < 0 then count
@@ -11,35 +6,42 @@ let count str char =
     in
     aux 0 ((String.length str) - 1)
 
-let is_correct char min max pass = 
+let is_valid_1 char min max pass = 
     let num = count pass char in
     min <= num && num <= max
 
-let process_line line = 
+let process_line f line = 
     let array = Array.of_list (String.split_on_char ' ' line) in
     let pass = array.(2) in
     let char = array.(1).[0] in
     let range = Array.of_list (String.split_on_char '-' array.(0)) in
     let min = int_of_string range.(0) in
     let max = int_of_string range.(1) in
-    is_correct char min max pass
+    f char min max pass
 
 let rec count el list = 
     match list with
     | [] -> 0
     | x::xs -> if x = el then 1 + count el xs else count el xs
 
-let arr = process_line "8-16 w: vwxmrfwwlwtswwtcww"
-
 let naloga1 vsebina_datoteke =
     vsebina_datoteke
     |> String.split_on_char '\n'
-    |> List.map process_line
+    |> List.map (process_line is_valid_1)
     |> count true
     |> string_of_int
 
+let is_valid_2 char min max pass = 
+    let first = (pass.[min - 1] = char) in
+    let second = (pass.[max - 1] = char) in
+    first <> second
+
 let naloga2 vsebina_datoteke =
-    string_of_int (String.length vsebina_datoteke)
+    vsebina_datoteke
+    |> String.split_on_char '\n'
+    |> List.map (process_line is_valid_2)
+    |> count true
+    |> string_of_int
 
 let _ =
     let preberi_datoteko ime_datoteke =
