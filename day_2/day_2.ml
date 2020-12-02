@@ -15,13 +15,32 @@ let is_correct char min max pass =
     let num = count pass char in
     min <= num && num <= max
 
+let process_line line = 
+    let array = Array.of_list (String.split_on_char ' ' line) in
+    let pass = array.(2) in
+    let char = array.(1).[0] in
+    let range = Array.of_list (String.split_on_char '-' array.(0)) in
+    let min = int_of_string range.(0) in
+    let max = int_of_string range.(1) in
+    is_correct char min max pass
+
+let rec count el list = 
+    match list with
+    | [] -> 0
+    | x::xs -> if x = el then 1 + count el xs else count el xs
+
+let arr = process_line "8-16 w: vwxmrfwwlwtswwtcww"
+
 let naloga1 vsebina_datoteke =
     vsebina_datoteke
+    |> String.split_on_char '\n'
+    |> List.map process_line
+    |> count true
+    |> string_of_int
 
 let naloga2 vsebina_datoteke =
     string_of_int (String.length vsebina_datoteke)
 
-(*
 let _ =
     let preberi_datoteko ime_datoteke =
         let chan = open_in ime_datoteke in
@@ -39,4 +58,3 @@ let _ =
     in
     izpisi_datoteko "day_2/task_1.out" odgovor1;
     izpisi_datoteko "day_2/task_2.out" odgovor2
-*)
