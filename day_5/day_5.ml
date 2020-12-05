@@ -20,8 +20,21 @@ let naloga1 vsebina_datoteke =
     |> List.fold_left max 0
     |> string_of_int
 
+module S = Set.Make(Int);;
+
+let find taken =
+    let set = List.fold_right S.add taken S.empty in
+    let rec aux i = 
+        if not (S.mem i set) && (S.mem (i - 1) set) then i
+        else aux (i + 1)
+    in aux 0
+
 let naloga2 vsebina_datoteke =
-    "kmalu"
+    vsebina_datoteke
+    |> String.split_on_char '\n'
+    |> List.map to_decimal
+    |> find
+    |> string_of_int
 
 let _ =
     let preberi_datoteko ime_datoteke =
