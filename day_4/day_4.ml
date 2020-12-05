@@ -71,9 +71,7 @@ let rec all_valid list =
     | [] -> true
     | x::xs ->
         if is_field_valid (List.hd x) (List.hd (List.tl x)) then all_valid xs
-        else
-            let a = print_endline ((List.hd x) ^ " " ^ (List.hd (List.tl x))); in
-            false
+        else false
 
 let is_valid2 passport = 
     let sep = List.map (String.split_on_char ':') (String.split_on_char ' ' passport) in
