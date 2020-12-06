@@ -1,6 +1,7 @@
 module S = Set.Make(Char);;
 
-let count_chars str = 
+let count_chars list = 
+    let str = String.concat "" list in
     let rec aux set count i = 
         if i < 0 then count
         else if S.mem str.[i] set then 
@@ -9,12 +10,12 @@ let count_chars str =
     in
     aux S.empty 0 ((String.length str) - 1)
 
-let solve list = 
+let solve f list = 
     let rec aux sum acc rest = 
         match rest with
-        | [] -> sum + count_chars (String.concat "" acc)
+        | [] -> sum + f acc
         | x::xs ->
-            if x = "" then aux (sum + count_chars (String.concat "" acc)) [] xs
+            if x = "" then aux (sum + f acc) [] xs
             else aux sum (x::acc) xs
     in
     aux 0 [] list
@@ -22,11 +23,28 @@ let solve list =
 let naloga1 vsebina_datoteke =
     vsebina_datoteke
     |> String.split_on_char '\n'
-    |> solve
+    |> solve count_chars
     |> string_of_int
 
+let intersection list = 
+    let set_from_string str = 
+        let rec aux set i = 
+            if i < 0 then set
+            else aux (S.add str.[i] set) (i - 1)
+        in
+        aux S.empty ((String.length str) - 1)
+    in
+    let sets = List.map set_from_string list in
+    match sets with
+    | [] -> 0
+    | x::xs -> S.cardinal (List.fold_left S.inter x xs)
+
+
 let naloga2 vsebina_datoteke =
-    "lol"
+    vsebina_datoteke
+    |> String.split_on_char '\n'
+    |> solve intersection
+    |> string_of_int
 
 let _ =
     let preberi_datoteko ime_datoteke =
