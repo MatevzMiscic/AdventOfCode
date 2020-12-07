@@ -8,29 +8,20 @@ let bag str =
     let sub = Array.sub array 1 (Array.length array - 2) in
     String.concat " " (Array.to_list sub)
 
-let bags str = 
+let bags f str = 
     match Str.split (Str.regexp " bags contain ") str with
     | x1::x2::[] when x2 = "no other bags." -> (x1, [])
     | x1::x2::[] -> 
         let trimmed = String.trim (String.sub x2 0 ((String.length x2) - 1)) in
         let list = String.split_on_char ',' trimmed in
-        (x1, List.map bag list)
+        (x1, List.map f list)
     | _ -> failwith "Napaka"
-
-let a = bags "dotted silver bags contain 2 dotted orange bags, 3 bright fuchsia bags, 5 bright tomato bags, 3 faded turquoise bags."
-
-let rec make_graph list = 
-    match list with
-    | [] -> M.empty
-    | line::rest -> 
-        let x, xs = bags line in
-        M.add x xs (make_graph rest)
 
 let rec make_graph2 list = 
     match list with
     | [] -> M.empty
     | line::rest -> 
-        let x, xs = bags line in
+        let x, xs = bags bag line in
         let rec add_edges graph vertex verteces = 
             match verteces with
             | [] -> graph
@@ -43,7 +34,7 @@ let rec make_graph2 list =
         add_edges (make_graph2 rest) x xs 
 
 let rec dfs graph visited v = 
-    print_endline v;
+    (*print_endline v;*)
     let visited = S.add v visited in
     if not (M.mem v graph) then visited else
     let adj = M.find v graph in
@@ -55,41 +46,36 @@ let rec dfs graph visited v =
     | u::us -> dfs (M.add v us graph) visited v
 
 let solve list = 
-    S.cardinal (dfs (make_graph2 list) S.empty "shiny gold") - 1 
+    S.cardinal (dfs (make_graph2 list) S.empty "shiny gold") - 1
 
-let list = [
-    "light red bags contain 1 bright white bag, 2 muted yellow bags.";
-    "dark orange bags contain 3 bright white bags, 4 muted yellow bags.";
-    "bright white bags contain 1 shiny gold bag.";
-    "muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.";
-    "shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.";
-    "dark olive bags contain 3 faded blue bags, 4 dotted black bags.";
-    "vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.";
-    "faded blue bags contain no other bags.";
-    "dotted black bags contain no other bags.";
-]
-(*
-let graph = make_graph2 list
-let s = dfs (make_graph2 list) S.empty "shiny gold"
+let bag_count str = 
+    let array = Array.of_list (String.split_on_char ' ' (String.trim str)) in
+    let sub = Array.sub array 1 (Array.length array - 2) in
+    (String.concat " " (Array.to_list sub), int_of_string array.(0))
 
+let rec make_graph list = 
+    match list with
+    | [] -> M.empty
+    | line::rest -> 
+        let x, xs = bags bag_count line in
+        M.add x xs (make_graph rest)
 
+(* graf mora biti usmerjen acikličen graf*)
+let rec dfs2 graph numbers v = 
+    (*print_endline v;*)
+    let numbers = if M.mem v numbers then numbers else M.add v 1 numbers in
+    if not (M.mem v graph) then numbers else
+    let adj = M.find v graph in
+    match adj with
+    | [] -> numbers
+    | (u, n)::us when not (M.mem u numbers) -> 
+        let numbers = dfs2 graph numbers u in
+        dfs2 (M.add v us graph) (M.add v ((M.find v numbers) + (M.find u numbers) * n) numbers) v
+    | (u, n)::us ->
+        dfs2 (M.add v us graph) (M.add v ((M.find v numbers) + (M.find u numbers) * n) numbers) v
 
-    let visited = S.add v visited in
-    let rec traverse adj visited = 
-        match adj with
-        | [] -> visited
-        | v::vs when not S.mem v visited -> traverse vs
-
-    let aux map graph list = 
-        match list with
-        | [] -> (map, graph)
-        | line::rest -> 
-            let x, xs = bags line in
-*)
-
-let m = M.empty
-let m = M.add "a" [] m 
-let m = M.add "a" (1::(M.find "a" m)) m
+let solve2 list = 
+    M.find "shiny gold" (dfs2 (make_graph list) M.empty "shiny gold") - 1
 
 let naloga1 vsebina_datoteke =
     vsebina_datoteke
@@ -98,7 +84,10 @@ let naloga1 vsebina_datoteke =
     |> string_of_int
 
 let naloga2 vsebina_datoteke =
-    "kmalu"
+    vsebina_datoteke
+    |> String.split_on_char '\n'
+    |> solve2
+    |> string_of_int
 
 let _ =
     let preberi_datoteko ime_datoteke =
