@@ -32,8 +32,38 @@ let naloga1 vsebina_datoteke =
     |> run 0 0 S.empty
     |> string_of_int
 
+let rec terminates change acc index seen instructions = 
+    if S.mem index seen then -1
+    else if index < 0 || (Array.length instructions) < index then
+        -1
+    else if index = Array.length instructions then
+        acc
+    else
+        let seen = S.add index seen in
+        match instructions.(index) with
+        | (oper, arg) when oper = 0 -> terminates change (acc + arg) (index + 1) seen instructions
+        | (oper, arg) when oper = 1 -> 
+            if index = change then terminates change acc (index + 1) seen instructions
+            else terminates change acc (index + arg) seen instructions
+        | (oper, arg) -> 
+            if index = change then terminates change acc (index + arg) seen instructions
+            else terminates change acc (index + 1) seen instructions
+
+let repair instructions = 
+    let rec aux index = 
+        let ter = terminates index 0 0 S.empty instructions in
+        if ter <> -1 then ter
+        else aux (index - 1)
+    in
+    aux (Array.length instructions - 1)
+
 let naloga2 vsebina_datoteke =
-    "kmalu"
+    vsebina_datoteke
+    |> String.split_on_char '\n'
+    |> List.map to_inst
+    |> Array.of_list
+    |> repair
+    |> string_of_int
 
 let _ =
     let preberi_datoteko ime_datoteke =
