@@ -1,12 +1,7 @@
-module S = Set.Make(Int);;
-module M = Map.Make(String);;
 
 let rec is_sum num array = 
-    (*print_endline (string_of_int (Array.length array));*)
     let rec aux i j = 
-        (*print_endline ((string_of_int i) ^ ", " ^ (string_of_int j));*)
         if array.(i) + array.(j) = num then
-            (*let _ = print_endline "true" in*)
             true
         else if j + 1 < Array.length array then
             aux i (j + 1)
@@ -32,8 +27,34 @@ let naloga1 vsebina_datoteke =
     |> solve
     |> string_of_int
 
+let rec find_sum num array = 
+    let rec aux sum i j = 
+        if sum = num then
+            (i, j)
+        else if j + 1 < Array.length array then
+            aux (sum + array.(j + 1)) i (j + 1)
+        else if i + 2 < Array.length array then
+            aux (array.(i + 1) + array.(i + 2)) (i + 1) (i + 2)
+        else
+            failwith "Napaka"
+    in
+    aux (array.(0) + array.(1)) 0 1
+
+(* tukaj je treba vstaviti rešitev prve naloge namesto 393911906*)
+let solve2 array = 
+    let i, j = find_sum 393911906 array in
+    let sub = Array.sub array i (j - i + 1) in
+    let min = Array.fold_left min sub.(0) sub in
+    let max = Array.fold_left max sub.(0) sub in
+    min + max
+
 let naloga2 vsebina_datoteke =
-    "bo enkrat"
+    vsebina_datoteke
+    |> String.split_on_char '\n'
+    |> List.map int_of_string
+    |> Array.of_list
+    |> solve2
+    |> string_of_int
 
 let _ =
     let preberi_datoteko ime_datoteke =
