@@ -1,4 +1,4 @@
-
+module M = Map.Make(Int);;
 
 let solve list = 
     let sorted = List.sort compare list in
@@ -26,9 +26,31 @@ let naloga1 vsebina_datoteke =
     |> solve
     |> string_of_int
 
+let change el delta map = 
+    if M.mem el map then M.add el (M.find el map + delta) map
+    else M.add el delta map
+
+let solve2 list = 
+    let sorted = List.sort compare list in
+    let list2 = (0::sorted) @ [List.hd (List.rev sorted) + 3] in
+    let rec count_paths map list = 
+        match list with
+        | [] -> failwith "prekratek seznam"
+        | [x] -> M.find x map
+        | a::b::rest -> 
+            let map = change a 0 map in
+            let delta = M.find a map in
+            let map = map |> change (a+1) delta |> change (a+2) delta |> change (a+3) delta in 
+            count_paths map (b::rest)
+    in
+    count_paths (M.add 0 1 M.empty) list2
 
 let naloga2 vsebina_datoteke =
-    "še malo"
+    vsebina_datoteke
+    |> String.split_on_char '\n'
+    |> List.map int_of_string
+    |> solve2
+    |> string_of_int
 
 let _ =
     let preberi_datoteko ime_datoteke =
