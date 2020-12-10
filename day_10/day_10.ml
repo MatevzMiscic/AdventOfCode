@@ -8,15 +8,12 @@ let solve list =
         | [a] -> (one, three)
         | a::b::rest -> 
             if b - a = 1 then 
-                (*let _ = print_endline ((string_of_int a) ^ " -> " ^ (string_of_int b) ^ "   1") in*)
                 aux (one + 1, three) (b::rest)
             else if b - a = 3 then 
-                (*let _ = print_endline ((string_of_int a) ^ " -> " ^ (string_of_int b) ^ "   3") in*)
                 aux (one, three + 1) (b::rest)
             else aux (one, three) (b::rest)
     in
     let (one, three) = aux (0, 0) (0::sorted) in
-    (*print_endline ((string_of_int one) ^ ", " ^ (string_of_int three));*)
     one * (three + 1)
 
 let naloga1 vsebina_datoteke =

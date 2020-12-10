@@ -41,19 +41,19 @@ let rec find_sum num array =
     aux (array.(0) + array.(1)) 0 1
 
 (* tukaj je treba vstaviti rešitev prve naloge namesto 393911906*)
-let solve2 array = 
-    let i, j = find_sum 393911906 array in
+let solve2 odgovor1 array = 
+    let i, j = find_sum odgovor1 array in
     let sub = Array.sub array i (j - i + 1) in
     let min = Array.fold_left min sub.(0) sub in
     let max = Array.fold_left max sub.(0) sub in
     min + max
 
-let naloga2 vsebina_datoteke =
+let naloga2 odgovor1 vsebina_datoteke =
     vsebina_datoteke
     |> String.split_on_char '\n'
     |> List.map int_of_string
     |> Array.of_list
-    |> solve2
+    |> solve2 (int_of_string odgovor1)
     |> string_of_int
 
 let _ =
@@ -68,8 +68,7 @@ let _ =
         close_out chan
     in
     let vsebina_datoteke = preberi_datoteko "day_9/input.in" in
-    let odgovor1 = naloga1 vsebina_datoteke
-    and odgovor2 = naloga2 vsebina_datoteke
-    in
+    let odgovor1 = naloga1 vsebina_datoteke in
+    let odgovor2 = naloga2 odgovor1 vsebina_datoteke in
     izpisi_datoteko "day_9/task_1.out" odgovor1;
     izpisi_datoteko "day_9/task_2.out" odgovor2
